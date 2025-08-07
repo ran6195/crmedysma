@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\DomainType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,10 +12,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('domains', function (Blueprint $table) {
-            $table->id();
-            $table->string('nome')->unique();
-            $table->timestamps();
+        Schema::table('domains', function (Blueprint $table) {
+            $table->enum('tipo', array_map(fn($tipo) => $tipo->value, DomainType::cases()))->default(DomainType::CUSTOM->value)->after('nome');
         });
     }
 
@@ -23,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('domains');
+        Schema::table('domains', function (Blueprint $table) {
+            $table->dropColumn('tipo');
+        });
     }
 };
